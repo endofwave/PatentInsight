@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio - PatentInsight{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="text-primary mb-4">Patent Portfolio</h1>
+        <p class="lead text-muted mb-5">Interactive patent analysis projects with mathematical modeling and simulations.</p>
+        
+        {% if projects %}
+        <div class="row g-4">
+            {% for project in projects %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">{{ project.name }}</h5>
+                        <p class="card-text text-muted">Patent analysis with interactive simulation</p>
+                        
+                        <div class="mt-3">
+                            {% if project.has_simulation %}
+                            <span class="badge bg-success me-2">Simulation</span>
+                            {% endif %}
+                            <span class="badge bg-info">Analysis</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ url_for('project_detail', project_id=project.id) }}" 
+                           class="btn btn-primary btn-sm">View Analysis</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="text-muted">
+                <h4>No projects available yet</h4>
+                <p>Add patent analysis projects to the projects/ directory</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
