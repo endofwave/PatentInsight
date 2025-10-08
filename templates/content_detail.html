@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{{ content.name }} - PatentInsight{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="text-primary">{{ content.name }}</h1>
+            <div class="badge-container mt-2">
+                {% if content.type == 'project' %}
+                <span class="badge bg-primary me-2">Patent Analysis</span>
+                {% else %}
+                <span class="badge bg-success me-2">Technical Article</span>
+                {% endif %}
+                {% if content.has_simulation %}
+                <span class="badge bg-warning">Interactive Simulation</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content-section mb-5">
+            {{ content.content|safe }}
+        </div>
+
+        <!-- Simulation Section -->
+        {% if content.has_simulation %}
+        <div class="simulation-section border rounded p-4 bg-light mb-5">
+            <h3 class="text-warning mb-4">🎯 Interactive Simulation</h3>
+            <p class="text-muted mb-3">Run the simulation to see the mathematical model in action:</p>
+            
+            <button id="runSimulationBtn" class="btn btn-warning btn-lg mb-4">
+                🚀 Run Simulation
+            </button>
+            
+            <div id="simulationResults" class="d-none">
+                <div class="alert alert-info">
+                    <h5>Simulation Output</h5>
+                    <pre id="simulationOutput" class="bg-dark text-light p-3 rounded"></pre>
+                </div>
+                
+                <div id="simulationPlots" class="text-center"></div>
+                
+                <button id="resetSimulationBtn" class="btn btn-outline-secondary mt-3">
+                    🔄 Reset Simulation
+                </button>
+            </div>
+            
+            <div id="simulationLoading" class="d-none text-center">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">Running simulation...</span>
+                </div>
+                <p class="mt-2 text-muted">Running simulation...</p>
+            </div>
+            
+            <div id="simulationError" class="alert alert-danger d-none"></div>
+        </div>
+        {% endif %}
+
+        <!-- Navigation -->
+        <div class="text-center mt-5">
+            {% if content.type == 'project' %}
+            <a href="{{ url_for('portfolio') }}" class="btn btn-outline-primary">
+                ← Back to Portfolio
+            </a>
+            {% else %}
+            <a href="{{ url_for('blog') }}" class="btn btn-outline-success">
+                ← Back to Blog
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Simulation JavaScript -->
+<script>
+document.getElementById('runSimulationBtn').addEventListener('click', function() {
+    const resultsDiv = document.getElementById('simulationResults');
+    const loadingDiv = document.getElementById('simulationLoading');
+    const errorDiv = document.getElementById('simulationError');
+    const outputPre = document.getElementById('simulationOutput');
+    const plotsDiv = document.getElementById('simulationPlots');
+    
+    // Show loading, hide others
+    loadingDiv.classList.remove('d-none');
+    resultsDiv.classList.add('d-none');
+    errorDiv.classList.add('d-none');
+    this.disabled = true;
+    
+    // Run simulation via AJAX
+    fetch("{{ url_for('run_simulation', content_type=content.type, content_id=content.id) }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        loadingDiv.classList.add('d-none');
+        this.disabled = false;
+        
+        if (data.success) {
+            // Show output
+            outputPre.textContent = data.output || 'Simulation completed successfully.';
+            
+            // Show plots
+            plotsDiv.innerHTML = '';
+            data.plots.forEach((plotData, index) => {
+                const img = document.createElement('img');
+                img.src = 'data:image/png;base64,' + plotData;
+                img.className = 'img-fluid mb-3 border rounded';
+                img.alt = `Simulation Plot ${index + 1}`;
+                plotsDiv.appendChild(img);
+            });
+            
+            resultsDiv.classList.remove('d-none');
+        } else {
+            errorDiv.textContent = data.error || 'Simulation failed.';
+            errorDiv.classList.remove('d-none');
+        }
+    })
+    .catch(error => {
+        loadingDiv.classList.add('d-none');
+        this.disabled = false;
+        errorDiv.textContent = 'Error running simulation: ' + error;
+        errorDiv.classList.remove('d-none');
+    });
+});
+
+document.getElementById('resetSimulationBtn').addEventListener('click', function() {
+    document.getElementById('simulationResults').classList.add('d-none');
+});
+</script>
+
+<style>
+.content-section {
+    line-height: 1.6;
+}
+.content-section h2 {
+    color: #2C5AA0;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+.content-section h3 {
+    color: #28A745;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.content-section p {
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
