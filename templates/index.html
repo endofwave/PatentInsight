@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PatentInsight{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 fw-bold text-primary mb-4">Welcome to PatentInsight</h1>
+        <p class="lead text-muted mb-5">
+            Interactive patent analysis hub with mathematical modeling and simulations
+        </p>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">📋 Portfolio</h5>
+                        <p class="card-text">Explore our patent analysis projects with interactive simulations.</p>
+                        <a href="{{ url_for('portfolio') }}" class="btn btn-primary">View Portfolio</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100 border-success">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">📝 Technical Blog</h5>
+                        <p class="card-text">Read technical articles about patent analysis methodologies.</p>
+                        <a href="{{ url_for('blog') }}" class="btn btn-success">View Blog</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-5">
+            <h3 class="text-secondary">Featured Content</h3>
+            <p class="text-muted">Each project and article combines technical analysis, mathematical modeling, and interactive simulations.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
